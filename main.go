@@ -14,6 +14,7 @@ import (
 	"github.com/ochinchina/supervisord/config"
 	"github.com/ochinchina/supervisord/logger"
 	log "github.com/sirupsen/logrus"
+	"golang.org/x/sys/windows"
 )
 
 var BuildVersion string = ""
@@ -51,6 +52,14 @@ func init() {
 		}
 	}
 	log.SetLevel(log.DebugLevel)
+
+	if runtime.GOOS == "windows" {
+		var mode uint32
+		handle := windows.Handle(os.Stdout.Fd())
+		if err := windows.GetConsoleMode(handle, &mode); err == nil {
+			err = windows.SetConsoleMode(handle, mode|windows.ENABLE_VIRTUAL_TERMINAL_PROCESSING)
+		}
+	}
 }
 
 var options Options
